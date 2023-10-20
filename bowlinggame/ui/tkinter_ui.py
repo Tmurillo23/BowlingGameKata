@@ -114,9 +114,13 @@ class BowlingApp(CTk):
             if roll < 0:
                 message = "Roll must be a positive integer value"
                 messagebox.showwarning(title="Validation error", message=message, parent=self)
-            else:
+            elif 0 <= self.game.current_frame_index < 9:
                 self.game.roll(roll)
                 self.frames[self.game.current_frame_index].activate()
+                self.update_frames()
+            elif self.game.current_frame_index == 9 and self.game.roll == 10:
+                self.game.roll(roll)
+                self.frames[9].activate()
                 self.update_frames()
         except ValueError:
             message = "Roll must be an integer value"
@@ -128,7 +132,11 @@ class BowlingApp(CTk):
             self.add_roll_entry.focus()
 
     def load_from_file(self):
-        pass
+        with open('score.txt', encoding="utf-8") as f:
+            read_data = f.read()
+            strings = read_data.split()
+            for i in enumerate(self.game.frames):
+                self.frames[i].update_rolls(strings[i])
 
     def update_frames(self):
         for i, frame in enumerate(self.game.frames):
